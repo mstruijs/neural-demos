@@ -113,9 +113,9 @@ def run_to_convergence(input_data, show_list=[]):
 	return result
 	
 if __name__ == "__main__":
-	training_data = read_data("hopfield-numbers-10x10-training.txt")
+	training_data = read_data("data\hopfield-numbers-10x10-training.txt")
 	train(training_data)
-	test_data = read_data("hopfield-numbers-10x10-test.txt")
+	test_data = read_data("data\hopfield-numbers-10x10-test.txt")
 	ascii_visualise(test_data[0])
 	step_run = False
 	if step_run:
