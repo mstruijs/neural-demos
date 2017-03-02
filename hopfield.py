@@ -115,16 +115,12 @@ def run_to_convergence(input_data, show_list=[]):
 if __name__ == "__main__":
 	training_data = read_data("hopfield-numbers-10x10-training.txt")
 	train(training_data)
-	#print(dhnet.weight)
 	test_data = read_data("hopfield-numbers-10x10-test.txt")
 	ascii_visualise(test_data[0])
 	step_run = False
 	if step_run:
 		initialise_run(test_data[0])
 		for i in range(1,300,5):
-		#This doesn't actually stabilise, as the entire iteration is reset for every run.
-		#Unfortunatly, the method provided by Neupy doesn't give enough control over iteration or stopping early.
-		#TODO: Create iterative method for neupy.algorithms.DiscreteHopfieldNetwork
 			print("Iteration " + str(i) + ":")
 			step(step_size=5,show=True)
 			if is_stable():
