@@ -1,15 +1,19 @@
 import numpy as np
 from neupy import algorithms,plots
 import matplotlib.pyplot as plt
+from neupy.utils import format_data
+from neupy.algorithms.memory.utils import bin2sign,step_function
 
-dhnet = algorithms.DiscreteHopfieldNetwork(mode='async', check_limit=False) 
+dhnet = algorithms.DiscreteHopfieldNetwork(mode='async', check_limit=False)
+iteration = 0
+output_data = None
+n_features = 0
 
-def ascii_visualise(bin_array, m=10,n=10):
+def ascii_visualise(bin_vector, m=10,n=10):
 	'''
-	Basic visualisation for debug purposes: print binary array as m x n matrix
-	'''
-	
-	for row in bin_array.reshape((n,m)).tolist():
+	Basic visualisation for debug purposes: print binary vector as m x n matrix
+	'''	
+	for row in bin_vector.reshape((n,m)).tolist():
 		print(' '.join('.X'[val] for val in row))
 
 def read_data(filename):
@@ -45,17 +49,37 @@ def show_weights():
 	plots.hinton(dhnet.weight)
 	plt.show()
 
+def initialise_run(input_data):
+	global iteration,dhnet,output_data,n_features
+	iteration = 0
+	dhnet.discrete_validation(input_data)
+	input_data = format_data(bin2sign(input_data), is_feature1d=False)
+	_, n_features = input_data.shape
+	output_data = input_data
+	
+def step(step_size=1,show=False):
+	global iteration,dhnet,output_data,n_features
+	for _ in range(step_size):
+		iteration+=1
+		position = np.random.randint(0, n_features - 1)
+		raw_new_value = output_data.dot(dhnet.weight[:, position])
+		output_data[:, position] = np.sign(raw_new_value)
+	result = step_function(output_data).astype(int)
+	if show:
+		ascii_visualise(result)
+	return result
+	
 	
 if __name__ == "__main__":
 	training_data = read_data("hopfield-numbers-10x10-training.txt")
 	train(training_data)
-	print(dhnet.weight)
+	#print(dhnet.weight)
 	test_data = read_data("hopfield-numbers-10x10-test.txt")
-	ascii_visualise(test_data[1])
-	for i in range(1,100,5): 
+	ascii_visualise(test_data[0])
+	initialise_run(test_data[0])
+	for i in range(1,300,5):
 	#This doesn't actually stabilise, as the entire iteration is reset for every run.
 	#Unfortunatly, the method provided by Neupy doesn't give enough control over iteration or stopping early.
 	#TODO: Create iterative method for neupy.algorithms.DiscreteHopfieldNetwork
-		print()
-		run(test_data[1],iterations=i,show=True)
-	
+		print("Iteration " + str(i) + ":")
+		step(step_size=5,show=True)
