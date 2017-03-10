@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="214.0" minWidth="540.0" prefHeight="298.0" prefWidth="540.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.OpenController">
+   <children>
+      <Pane prefHeight="63.0" prefWidth="580.0">
+         <children>
+            <Text layoutX="3.0" layoutY="18.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Neural network" />
+            <ComboBox id="nnComboPicker" fx:id="nnComboBox" layoutY="28.0" prefWidth="150.0" />
+         </children>
+      </Pane>
+      <Pane prefHeight="78.0" prefWidth="580.0">
+         <children>
+            <Text layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Script location" wrappingWidth="138.13671875" />
+            <TextArea id="taTrainingData" fx:id="taScriptLocation" editable="false" layoutY="33.0" prefHeight="25.0" prefWidth="428.0" />
+            <Button id="btnTrainingDataBrowse" fx:id="btnScriptLocationBrowse" layoutX="437.0" layoutY="33.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="81.0" text="Browse" />
+         </children>
+      </Pane>
+      <Pane prefHeight="78.0" prefWidth="580.0">
+         <children>
+            <Text layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Training data" wrappingWidth="138.13671875" />
+            <TextArea id="taTrainingData" fx:id="taTrainingData" editable="false" layoutY="33.0" prefHeight="25.0" prefWidth="428.0" />
+            <Button id="btnTrainingDataBrowse" fx:id="btnTrainingBrowse" layoutX="437.0" layoutY="33.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="81.0" text="Browse" />
+         </children>
+      </Pane>
+      <Pane prefHeight="78.0" prefWidth="580.0">
+         <children>
+            <Text layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Test data" wrappingWidth="138.13671875" />
+            <TextArea id="taTestData" fx:id="taTestData" editable="false" layoutY="33.0" prefHeight="25.0" prefWidth="428.0" />
+            <Button id="btnTestDataBrowse" fx:id="btnTestBrowse" layoutX="437.0" layoutY="33.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="81.0" text="Browse" />
+         </children>
+      </Pane>
+      <Pane prefHeight="78.0" prefWidth="580.0">
+         <children>
+            <Button id="btnOpenDone" fx:id="btnDoneLoad" layoutX="437.0" layoutY="33.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="81.0" text="Done" />
+            <Button id="btnOpenCancel" fx:id="btnCancelLoad" layoutX="344.0" layoutY="33.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="81.0" text="Cancel" />
+         </children>
+      </Pane>
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</VBox>

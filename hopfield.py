@@ -3,6 +3,7 @@ from neupy import algorithms,plots
 import matplotlib.pyplot as plt
 from neupy.utils import format_data
 from neupy.algorithms.memory.utils import bin2sign,step_function
+import argparse
 
 dhnet = algorithms.DiscreteHopfieldNetwork(mode='async', check_limit=False)
 iteration = 0
@@ -84,7 +85,7 @@ def step(step_size=1, show=False):
 		output_data[:, position] = np.sign(raw_new_value)
 	result = step_function(output_data).astype(int)
 	if show:
-		print("Iteration " + str(iteration) + ":")
+		print("--Iteration " + str(iteration) + ":")
 		ascii_visualise(result)
 	return result
 
@@ -112,20 +113,30 @@ def run_to_convergence(input_data, show_list=[]):
 		result=step(show=(i in show_list))
 	return result
 	
+def get_args():
+	parser = argparse.ArgumentParser(description='Hopfield neural network')
+	parser.add_argument('-g','--train', help='Training data set path', required=True)
+	parser.add_argument('-t','--test', help='Testing data set path', required=True)
+	return vars(parser.parse_args())
+	
 if __name__ == "__main__":
-	training_data = read_data("data\hopfield-numbers-10x10-training.txt")
+	args = get_args()
+	training_data = read_data(str(args['train']))
 	train(training_data)
-	test_data = read_data("data\hopfield-numbers-10x10-test.txt")
+	test_data = read_data(str(args['test']))
+	print('--Start')
 	ascii_visualise(test_data[0])
 	step_run = False
 	if step_run:
 		initialise_run(test_data[0])
 		for i in range(1,300,5):
-			print("Iteration " + str(i) + ":")
+			print("--Iteration " + str(i) + ":")
 			step(step_size=5,show=True)
 			if is_stable():
 				break
 	else:
 		res = run_to_convergence(test_data[0],[62,144,232,379])
-		print("Iteration " + str(iteration) + ":")
+		print("--Iteration " + str(iteration) + ":")
 		ascii_visualise(res)
+	print('--End')
+	
