@@ -1,5 +1,9 @@
 package controllers;
 
+import auxiliary.Statics;
+import configs.NeuralDemoConfig;
+import external.HopfieldPythonOutput;
+import external.PythonOutput;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -8,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -36,6 +41,8 @@ public class MainController {
     @FXML // MenuItem: Help -> About
     private MenuItem miAbout;
 
+    @FXML
+    private Pane bodyPane;
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
@@ -54,6 +61,7 @@ public class MainController {
         });
     }
 
+    public static boolean loadSuccess = false;
     void showLoadPopup() {
         Stage stage = new Stage();
         try {
@@ -64,13 +72,13 @@ public class MainController {
             stage.setOnHidden(new EventHandler<WindowEvent>() {
                 @Override
                 public void handle(WindowEvent event) {
+
                     loadNeuralNetwork();
                 }
             });
             stage.showAndWait();
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("xx");
         }
     }
 
@@ -80,6 +88,29 @@ public class MainController {
     }
 
     void loadNeuralNetwork() {
+
+        if (!loadSuccess) {
+            return;
+        }
+
+        System.out.println("loading neural network demo UI");
+
+        PythonOutput po = OpenController.po;
+        NeuralDemoConfig ndc = OpenController.nnCfg;
+
+        switch(ndc.getNnType()) {
+            case Hopfield:
+                loadHopfieldUI((HopfieldPythonOutput) po);
+                break;
+            default:
+                 System.out.println("uh oh");
+        }
+    }
+
+    void loadHopfieldUI(HopfieldPythonOutput hpo) {
+        for(boolean[][] matrix : hpo.getIterations()) {
+            Statics.printBooleanMatrix(matrix);
+        }
 
     }
 

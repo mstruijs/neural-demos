@@ -50,6 +50,14 @@ public class HopfieldPythonOutput extends PythonOutput {
         }
     }
 
+    public ArrayList<boolean[][]> getIterations() {
+        return this.iterations;
+    }
+
+    public boolean[][] getIteration(int index) {
+        return this.iterations.get(index);
+    }
+
     @Override
     protected void handleStdError(BufferedReader stdError) {
 

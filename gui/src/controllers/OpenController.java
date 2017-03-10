@@ -118,11 +118,14 @@ public class OpenController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Stage stage = (Stage) btnCancelLoad.getScene().getWindow();
+        MainController.loadSuccess = true;
+        stage.close();
     }
 
-    public static Stage dialogStage;
     private void cancelLoadDialog() {
         Stage stage = (Stage) btnCancelLoad.getScene().getWindow();
+        MainController.loadSuccess = false;
         stage.close();
     }
 
