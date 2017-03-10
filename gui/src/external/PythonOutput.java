@@ -11,7 +11,8 @@ public abstract class PythonOutput {
 
     protected boolean error;
 
-    public PythonOutput(BufferedReader stdInput, BufferedReader stdError, NeuralDemoConfig cfg) {
+    public PythonOutput(BufferedReader stdInput, BufferedReader stdError,
+                        NeuralDemoConfig cfg) {
         this.cfg = cfg;
         handleStdInput(stdInput);
         handleStdError(stdError);

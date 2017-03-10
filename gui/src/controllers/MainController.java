@@ -11,11 +11,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -65,7 +68,8 @@ public class MainController {
     void showLoadPopup() {
         Stage stage = new Stage();
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("../resources/open.fxml"), resources);
+            Parent root = FXMLLoader.load(getClass().getResource("../resources/open.fxml"),
+                    resources);
             stage.setScene(new Scene(root));
             stage.setTitle("Load neural network");
             stage.initModality(APPLICATION_MODAL);
@@ -107,11 +111,14 @@ public class MainController {
         }
     }
 
+    // Set the hopfield ui
     void loadHopfieldUI(HopfieldPythonOutput hpo) {
-        for(boolean[][] matrix : hpo.getIterations()) {
-            Statics.printBooleanMatrix(matrix);
+        try {
+            bodyPane.getChildren().add(FXMLLoader.load(getClass()
+                    .getResource("../resources/hopfield.fxml"), resources));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
     }
 
 }

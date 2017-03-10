@@ -11,7 +11,8 @@ public class HopfieldPythonOutput extends PythonOutput {
 
     private ArrayList<boolean[][]> iterations;
 
-    public HopfieldPythonOutput(BufferedReader stdInput, BufferedReader stdError, NeuralDemoConfig cfg) {
+    public HopfieldPythonOutput(BufferedReader stdInput, BufferedReader stdError,
+                                NeuralDemoConfig cfg) {
         super(stdInput, stdError, cfg);
     }
 
