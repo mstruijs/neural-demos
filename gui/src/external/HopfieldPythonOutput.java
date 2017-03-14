@@ -11,7 +11,8 @@ public class HopfieldPythonOutput extends PythonOutput {
 
     private ArrayList<boolean[][]> iterations;
 
-    public HopfieldPythonOutput(BufferedReader stdInput, BufferedReader stdError, NeuralDemoConfig cfg) {
+    public HopfieldPythonOutput(BufferedReader stdInput, BufferedReader stdError,
+                                NeuralDemoConfig cfg) {
         super(stdInput, stdError, cfg);
     }
 
@@ -48,6 +49,14 @@ public class HopfieldPythonOutput extends PythonOutput {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public ArrayList<boolean[][]> getIterations() {
+        return this.iterations;
+    }
+
+    public boolean[][] getIteration(int index) {
+        return this.iterations.get(index);
     }
 
     @Override
