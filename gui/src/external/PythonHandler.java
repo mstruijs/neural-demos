@@ -1,7 +1,6 @@
 package external;
 
 import configs.NeuralDemoConfig;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,7 +23,6 @@ public class PythonHandler {
         return buildPythonOutput(stdInput, stdError, cfg);
     }
 
-    @NotNull
     private String getPythonCliCommand(NeuralDemoConfig cfg) {
 
         StringBuilder sb = new StringBuilder();
