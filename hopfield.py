@@ -100,7 +100,7 @@ def is_stable():
 			return False
 	return True
 
-def run_to_convergence(input_data, show_list=[]):
+def run_to_convergence(input_data, show_list=[], show_all=True):
 	'''
 	Runs a trained network on `input_data` until it converges to a stable output.
 	Print the intermediate output at all positions in `show_list`.
@@ -110,7 +110,7 @@ def run_to_convergence(input_data, show_list=[]):
 	result = None
 	while not(is_stable()):
 		i+=1
-		result=step(show=(i in show_list))
+		result=step(show=(i in show_list or show_all))
 	return result
 	
 def get_args():

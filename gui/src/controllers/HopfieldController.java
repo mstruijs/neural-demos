@@ -52,9 +52,9 @@ public class HopfieldController {
 
         drawIteration();
 
-        for(boolean[][] matrix : hpo.getIterations()) {
-            Statics.printBooleanMatrix(matrix);
-        }
+        //for(boolean[][] matrix : hpo.getIterations()) {
+        //    Statics.printBooleanMatrix(matrix);
+        //}
 
         btnHfToFirst.setOnAction(new EventHandler<ActionEvent>() {
             @Override
