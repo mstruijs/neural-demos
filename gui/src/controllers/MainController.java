@@ -14,6 +14,9 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -35,6 +38,9 @@ public class MainController {
     @FXML // URL location of the FXML file that was given to the FXMLLoader
     private URL location;
 
+    @FXML
+    private AnchorPane mainPane;
+
     @FXML // MenuItem: File -> Load
     private MenuItem miFileLoad;
 
@@ -45,7 +51,7 @@ public class MainController {
     private MenuItem miAbout;
 
     @FXML
-    private Pane bodyPane;
+    private TabPane tabPaneMain;
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
@@ -62,6 +68,7 @@ public class MainController {
                 close();
             }
         });
+
     }
 
     public static boolean loadSuccess = false;
@@ -114,11 +121,12 @@ public class MainController {
     // Set the hopfield ui
     void loadHopfieldUI(HopfieldPythonOutput hpo) {
         try {
-            bodyPane.getChildren().add(FXMLLoader.load(getClass()
-                    .getResource("../resources/hopfield.fxml"), resources));
+            Tab tab = FXMLLoader.load(getClass().getResource("../resources/tab.fxml"), resources);
+            tab.setContent(FXMLLoader.load(getClass().getResource("../resources/hopfield.fxml"), resources));
+            tab.setText("Hopfield " + (tabPaneMain.getTabs().size() + 1));
+            tabPaneMain.getTabs().add(tab);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 }

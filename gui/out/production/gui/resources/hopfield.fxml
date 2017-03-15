@@ -7,14 +7,18 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="716.0" prefWidth="1057.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.HopfieldController">
    <children>
-      <Canvas fx:id="canvasHopfield" height="660.0" layoutX="10.0" layoutY="194.0" width="1046.0" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="50.0" />
-      <ToolBar fx:id="hopfieldToolbar" layoutY="4.0" prefHeight="40.0" prefWidth="547.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <Canvas fx:id="canvasHopfield" height="446.0" layoutX="10.0" layoutY="161.0" width="538.0" AnchorPane.bottomAnchor="109.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="161.0" />
+      <ToolBar fx:id="hopfieldToolbar" layoutY="4.0" prefHeight="40.0" prefWidth="1057.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <items>
             <Button fx:id="btnHfToFirst" mnemonicParsing="false" prefWidth="50.0" text="&lt;&lt;" />
             <Button fx:id="btnHfPrevious" mnemonicParsing="false" prefWidth="50.0" text="&lt;" />
             <Button fx:id="btnHfNext" mnemonicParsing="false" prefWidth="50.0" text="&gt;" />
             <Button fx:id="btnHfToLast" mnemonicParsing="false" prefWidth="50.0" text="&gt;&gt;" />
+            <Button fx:id="btnHfRun" mnemonicParsing="false" text="Run" />
+            <TextField fx:id="tfStepSize" prefHeight="25.0" prefWidth="75.0" promptText="Step size" />
+            <TextField fx:id="tfStepSpeed" prefHeight="25.0" prefWidth="75.0" promptText="Step speed" />
          </items>
       </ToolBar>
+      <TextArea fx:id="taDescription" editable="false" layoutX="20.0" layoutY="50.0" prefHeight="99.0" prefWidth="648.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="399.0" AnchorPane.topAnchor="50.0" />
    </children>
 </AnchorPane>

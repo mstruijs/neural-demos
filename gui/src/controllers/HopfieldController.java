@@ -1,14 +1,21 @@
 package controllers;
 
-import auxiliary.Statics;
 import external.HopfieldPythonOutput;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToolBar;
 import javafx.scene.paint.Color;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by ziad on 10/03/2017.
@@ -25,6 +32,15 @@ public class HopfieldController {
     double width;
     double height;
 
+    // animation speed
+    long stepSize;
+    long stepSpeed;
+    boolean animating;
+
+    // timer
+    Timer timer;
+    TimerTask task;
+
     @FXML
     Button btnHfToFirst;
 
@@ -38,23 +54,85 @@ public class HopfieldController {
     Button btnHfToLast;
 
     @FXML
+    Button btnHfRun;
+
+    @FXML
     Canvas canvasHopfield;
+
+    @FXML
+    ToolBar hopfieldToolbar;
+
+    @FXML
+    TextField tfStepSize;
+
+    @FXML
+    TextField tfStepSpeed;
+
+    @FXML
+    TextArea taDescription;
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
 
         this.hpo = (HopfieldPythonOutput) OpenController.po;
 
+        String description = "Script:\n" + this.hpo.getCfg().getScriptFile().getName() + "\n\n"
+                + "Training data:\n" + this.hpo.getCfg().getTrainingDataFile().getName() + "\n\n"
+                + "Test data:\n" + this.hpo.getCfg().getTestDataFile().getName();
+
+        this.taDescription.setText(description);
+
         this.currentIterationIndex = 0;
 
         this.width = 50;
         this.height = 50;
 
+        this.stepSize = 10;
+        this.stepSpeed = 1000;
+
+        this.animating = false;
+
+        tfStepSize.setText(this.stepSize + "");
+        tfStepSpeed.setText(this.stepSpeed + "");
+
+        this.timer = new Timer();
+
+        this.task = new TimerTask() {
+            @Override
+            public void run() {
+                doAnimationStep();
+            }
+        };
+
         drawIteration();
 
-        //for(boolean[][] matrix : hpo.getIterations()) {
-        //    Statics.printBooleanMatrix(matrix);
-        //}
+        tfStepSize.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (newValue.isEmpty()){
+                    return;
+                }
+                if (!newValue.matches("\\d*")) {
+                    tfStepSize.setText(newValue.replaceAll("[^\\d]", ""));
+                } else {
+                    stepSize = Integer.parseInt(newValue);
+                }
+            }
+        });
+
+        tfStepSpeed.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (newValue.isEmpty()){
+                    return;
+                }
+                if (!newValue.matches("\\d*")) {
+                    tfStepSpeed.setText(newValue.replaceAll("[^\\d]", ""));
+                } else {
+                    stepSpeed = Integer.parseInt(newValue);
+                }
+            }
+        });
 
         btnHfToFirst.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -83,6 +161,51 @@ public class HopfieldController {
                 lastIteration();
             }
         });
+
+        btnHfRun.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                animate();
+            }
+        });
+    }
+
+    void animate() {
+        if (!animating) {
+            btnHfRun.setText("Pause");
+            btnHfNext.setDisable(true);
+            btnHfToFirst.setDisable(true);
+            btnHfToLast.setDisable(true);
+            btnHfPrevious.setDisable(true);
+            tfStepSize.setDisable(true);
+            tfStepSpeed.setDisable(true);
+            this.timer.scheduleAtFixedRate(task, stepSpeed, stepSpeed);
+        } else {
+            btnHfRun.setText("Run");
+            btnHfNext.setDisable(false);
+            btnHfToFirst.setDisable(false);
+            btnHfToLast.setDisable(false);
+            btnHfPrevious.setDisable(false);
+            tfStepSize.setDisable(false);
+            tfStepSpeed.setDisable(false);
+            this.timer.cancel();
+            this.timer = new Timer();
+            this.task = new TimerTask() {
+                @Override
+                public void run() {
+                    doAnimationStep();
+                }
+            };
+        }
+        animating = !animating;
+    }
+
+    void doAnimationStep() {
+        this.currentIterationIndex += stepSize;
+        if (this.currentIterationIndex >= hpo.getIterations().size()) {
+            this.currentIterationIndex = hpo.getIterations().size() - 1;
+        }
+        drawIteration();
     }
 
     void drawIteration() {
