@@ -2,6 +2,9 @@ package controllers;
 
 import com.sun.javaws.progress.Progress;
 import external.HopfieldPythonOutput;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -13,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -40,6 +44,7 @@ public class HopfieldController {
     // timer
     Timer timer;
     TimerTask task;
+    Timeline atl;
 
     @FXML
     Button btnHfToFirst;
@@ -91,21 +96,17 @@ public class HopfieldController {
         this.height = 50;
 
         this.stepSize = 10;
-        this.stepSpeed = 1000;
+        this.stepSpeed = 200;
 
         this.animating = false;
 
         tfStepSize.setText(this.stepSize + "");
         tfStepSpeed.setText(this.stepSpeed + "");
 
-        this.timer = new Timer();
-
-        this.task = new TimerTask() {
-            @Override
-            public void run() {
-                doAnimationStep();
-            }
-        };
+        this.atl = new Timeline(new KeyFrame(Duration.millis(stepSpeed), event -> {
+            doAnimationStep();
+        }));
+        this.atl.setCycleCount(Animation.INDEFINITE);
 
         this.endReached = false;
 
@@ -135,6 +136,10 @@ public class HopfieldController {
                     tfStepSpeed.setText(newValue.replaceAll("[^\\d]", ""));
                 } else {
                     stepSpeed = Integer.parseInt(newValue);
+                    atl = new Timeline(new KeyFrame(Duration.millis(stepSpeed), event -> {
+                        doAnimationStep();
+                    }));
+                    atl.setCycleCount(Animation.INDEFINITE);
                 }
             }
         });
@@ -179,20 +184,17 @@ public class HopfieldController {
         if (!animating) {
             btnHfRun.setText("Pause");
             setInteractionPossible(true);
-            this.timer.scheduleAtFixedRate(task, stepSpeed, stepSpeed);
+            this.atl.play();
             animating = true;
         } else {
             btnHfRun.setText("Run");
             setInteractionPossible(false);
-            this.timer.cancel();
-            this.timer = new Timer();
-            this.task = new TimerTask() {
-                @Override
-                public void run() {
-                    doAnimationStep();
-                }
-            };
+            this.atl.stop();
             animating = false;
+            if (this.endReached) {
+                this.currentIterationIndex = 0;
+            }
+            this.endReached = false;
         }
     }
 
@@ -213,6 +215,9 @@ public class HopfieldController {
             this.endReached = true;
         }
         drawIteration();
+        if (this.endReached) {
+            btnHfRun.fire();
+        }
     }
 
     void drawIteration() {
