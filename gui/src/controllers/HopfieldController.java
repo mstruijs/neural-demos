@@ -1,5 +1,6 @@
 package controllers;
 
+import com.sun.javaws.progress.Progress;
 import external.HopfieldPythonOutput;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -8,10 +9,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
@@ -72,6 +70,9 @@ public class HopfieldController {
 
     @FXML
     Text textCurrentIteration;
+
+    @FXML
+    ProgressBar hfProgressBar;
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
@@ -179,6 +180,7 @@ public class HopfieldController {
             btnHfRun.setText("Pause");
             setInteractionPossible(true);
             this.timer.scheduleAtFixedRate(task, stepSpeed, stepSpeed);
+            animating = true;
         } else {
             btnHfRun.setText("Run");
             setInteractionPossible(false);
@@ -190,8 +192,8 @@ public class HopfieldController {
                     doAnimationStep();
                 }
             };
+            animating = false;
         }
-        animating = !animating;
     }
 
     void setInteractionPossible(boolean possible) {
@@ -224,6 +226,8 @@ public class HopfieldController {
         this.canvasHopfield.setHeight(matrix.length*height);
         this.canvasHopfield.setWidth(matrix.length*width);
 
+        this.hfProgressBar.setMinWidth(matrix.length*width);
+
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
                 double x = j*width;
@@ -235,6 +239,14 @@ public class HopfieldController {
                 gc.setFill(c);
                 gc.fillRect(x,y,width,height);
             }
+        }
+
+        double progress = ((double)this.currentIterationIndex)/((double)hpo.getIterations().size());
+
+        if (this.currentIterationIndex == hpo.getIterations().size() - 1) {
+            hfProgressBar.setProgress(1.0);
+        } else {
+            hfProgressBar.setProgress(progress);
         }
 
         drawBorder(gc);

@@ -125,6 +125,7 @@ public class MainController {
             tab.setContent(FXMLLoader.load(getClass().getResource("../resources/hopfield.fxml"), resources));
             tab.setText("Hopfield " + (tabPaneMain.getTabs().size() + 1));
             tabPaneMain.getTabs().add(tab);
+            tabPaneMain.getSelectionModel().select(tabPaneMain.getTabs().size() -1);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -8,7 +8,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="716.0" prefWidth="1057.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.HopfieldController">
    <children>
-      <Canvas fx:id="canvasHopfield" height="446.0" layoutX="323.0" layoutY="43.0" width="538.0" AnchorPane.bottomAnchor="227.0" AnchorPane.leftAnchor="323.0" AnchorPane.topAnchor="43.0" />
+      <Canvas fx:id="canvasHopfield" height="446.0" layoutX="323.0" layoutY="80.0" width="538.0" AnchorPane.bottomAnchor="190.0" AnchorPane.leftAnchor="323.0" AnchorPane.topAnchor="80.0" />
       <Pane layoutX="14.0" layoutY="14.0" prefHeight="200.0" prefWidth="290.0">
          <children>
             <Pane prefHeight="48.0" prefWidth="283.0">
@@ -29,12 +29,13 @@
             <Pane layoutY="94.0" prefHeight="60.0" prefWidth="206.0">
                <children>
                   <TextField fx:id="tfStepSpeed" layoutX="14.0" layoutY="21.0" prefHeight="25.0" prefWidth="166.0" promptText="Step speed" />
-                  <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Step speed" />
+                  <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Step speed (ms)" />
                </children>
             </Pane>
             <Text fx:id="taDescription" layoutX="14.0" layoutY="167.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="227.13671875" />
          </children>
       </Pane>
       <Text fx:id="textCurrentIteration" layoutX="323.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="410.759765625" />
+      <ProgressBar fx:id="hfProgressBar" layoutX="323.0" layoutY="48.0" prefWidth="200.0" progress="0.0" />
    </children>
 </AnchorPane>
