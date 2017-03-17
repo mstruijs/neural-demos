@@ -13,6 +13,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -60,16 +62,16 @@ public class HopfieldController {
     Canvas canvasHopfield;
 
     @FXML
-    ToolBar hopfieldToolbar;
-
-    @FXML
     TextField tfStepSize;
 
     @FXML
     TextField tfStepSpeed;
 
     @FXML
-    TextArea taDescription;
+    Text taDescription;
+
+    @FXML
+    Text textCurrentIteration;
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
@@ -103,6 +105,8 @@ public class HopfieldController {
                 doAnimationStep();
             }
         };
+
+        this.endReached = false;
 
         drawIteration();
 
@@ -173,21 +177,11 @@ public class HopfieldController {
     void animate() {
         if (!animating) {
             btnHfRun.setText("Pause");
-            btnHfNext.setDisable(true);
-            btnHfToFirst.setDisable(true);
-            btnHfToLast.setDisable(true);
-            btnHfPrevious.setDisable(true);
-            tfStepSize.setDisable(true);
-            tfStepSpeed.setDisable(true);
+            setInteractionPossible(true);
             this.timer.scheduleAtFixedRate(task, stepSpeed, stepSpeed);
         } else {
             btnHfRun.setText("Run");
-            btnHfNext.setDisable(false);
-            btnHfToFirst.setDisable(false);
-            btnHfToLast.setDisable(false);
-            btnHfPrevious.setDisable(false);
-            tfStepSize.setDisable(false);
-            tfStepSpeed.setDisable(false);
+            setInteractionPossible(false);
             this.timer.cancel();
             this.timer = new Timer();
             this.task = new TimerTask() {
@@ -200,20 +194,36 @@ public class HopfieldController {
         animating = !animating;
     }
 
+    void setInteractionPossible(boolean possible) {
+        btnHfNext.setDisable(possible);
+        btnHfToFirst.setDisable(possible);
+        btnHfToLast.setDisable(possible);
+        btnHfPrevious.setDisable(possible);
+        tfStepSize.setDisable(possible);
+        tfStepSpeed.setDisable(possible);
+    }
+
+    boolean endReached;
     void doAnimationStep() {
         this.currentIterationIndex += stepSize;
         if (this.currentIterationIndex >= hpo.getIterations().size()) {
             this.currentIterationIndex = hpo.getIterations().size() - 1;
+            this.endReached = true;
         }
         drawIteration();
     }
 
     void drawIteration() {
 
+        textCurrentIteration.setText("Current iteration: " + (this.currentIterationIndex + 1) + "/" + hpo.getIterations().size());
+
         GraphicsContext gc = canvasHopfield.getGraphicsContext2D();
-        gc.moveTo(0,0);
 
         boolean[][] matrix = hpo.getIteration(this.currentIterationIndex);
+
+        this.canvasHopfield.setHeight(matrix.length*height);
+        this.canvasHopfield.setWidth(matrix.length*width);
+
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
                 double x = j*width;
@@ -226,6 +236,17 @@ public class HopfieldController {
                 gc.fillRect(x,y,width,height);
             }
         }
+
+        drawBorder(gc);
+    }
+
+    private void drawBorder(GraphicsContext g) {
+        final double canvasWidth = g.getCanvas().getWidth();
+        final double canvasHeight = g.getCanvas().getHeight();
+
+        g.setStroke(Color.BLACK);
+        g.setLineWidth(4);
+        g.strokeRect(0, 0, canvasWidth, canvasHeight);
     }
 
     void firstIteration() {
