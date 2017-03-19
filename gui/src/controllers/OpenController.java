@@ -3,6 +3,7 @@ package controllers;
 import configs.NeuralDemoConfig;
 import external.PythonHandler;
 import external.PythonOutput;
+import external.RetentionFileChooser;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -159,7 +160,7 @@ public class OpenController {
     }
 
     private File chooseFile() {
-        File selectedFile = fileChooser.showOpenDialog(null);
+        File selectedFile = RetentionFileChooser.showOpenDialog();
         return selectedFile;
     }
 

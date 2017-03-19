@@ -1,14 +1,25 @@
 package controllers;
 
-import auxiliary.Statics;
+import com.sun.javaws.progress.Progress;
 import external.HopfieldPythonOutput;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
+import javafx.util.Duration;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by ziad on 10/03/2017.
@@ -25,6 +36,16 @@ public class HopfieldController {
     double width;
     double height;
 
+    // animation speed
+    long stepSize;
+    long stepSpeed;
+    boolean animating;
+
+    // timer
+    Timer timer;
+    TimerTask task;
+    Timeline atl;
+
     @FXML
     Button btnHfToFirst;
 
@@ -38,23 +59,90 @@ public class HopfieldController {
     Button btnHfToLast;
 
     @FXML
+    Button btnHfRun;
+
+    @FXML
     Canvas canvasHopfield;
+
+    @FXML
+    TextField tfStepSize;
+
+    @FXML
+    TextField tfStepSpeed;
+
+    @FXML
+    Text taDescription;
+
+    @FXML
+    Text textCurrentIteration;
+
+    @FXML
+    ProgressBar hfProgressBar;
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
 
         this.hpo = (HopfieldPythonOutput) OpenController.po;
 
+        String description = "Script:\n" + this.hpo.getCfg().getScriptFile().getName() + "\n\n"
+                + "Training data:\n" + this.hpo.getCfg().getTrainingDataFile().getName() + "\n\n"
+                + "Test data:\n" + this.hpo.getCfg().getTestDataFile().getName();
+
+        this.taDescription.setText(description);
+
         this.currentIterationIndex = 0;
 
         this.width = 50;
         this.height = 50;
 
+        this.stepSize = 10;
+        this.stepSpeed = 200;
+
+        this.animating = false;
+
+        tfStepSize.setText(this.stepSize + "");
+        tfStepSpeed.setText(this.stepSpeed + "");
+
+        this.atl = new Timeline(new KeyFrame(Duration.millis(stepSpeed), event -> {
+            doAnimationStep();
+        }));
+        this.atl.setCycleCount(Animation.INDEFINITE);
+
+        this.endReached = false;
+
         drawIteration();
 
-        for(boolean[][] matrix : hpo.getIterations()) {
-            Statics.printBooleanMatrix(matrix);
-        }
+        tfStepSize.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (newValue.isEmpty()){
+                    return;
+                }
+                if (!newValue.matches("\\d*")) {
+                    tfStepSize.setText(newValue.replaceAll("[^\\d]", ""));
+                } else {
+                    stepSize = Integer.parseInt(newValue);
+                }
+            }
+        });
+
+        tfStepSpeed.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (newValue.isEmpty()){
+                    return;
+                }
+                if (!newValue.matches("\\d*")) {
+                    tfStepSpeed.setText(newValue.replaceAll("[^\\d]", ""));
+                } else {
+                    stepSpeed = Integer.parseInt(newValue);
+                    atl = new Timeline(new KeyFrame(Duration.millis(stepSpeed), event -> {
+                        doAnimationStep();
+                    }));
+                    atl.setCycleCount(Animation.INDEFINITE);
+                }
+            }
+        });
 
         btnHfToFirst.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -83,14 +171,68 @@ public class HopfieldController {
                 lastIteration();
             }
         });
+
+        btnHfRun.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                animate();
+            }
+        });
+    }
+
+    void animate() {
+        if (!animating) {
+            btnHfRun.setText("Pause");
+            setInteractionPossible(true);
+            this.atl.play();
+            animating = true;
+        } else {
+            btnHfRun.setText("Run");
+            setInteractionPossible(false);
+            this.atl.stop();
+            animating = false;
+            if (this.endReached) {
+                this.currentIterationIndex = 0;
+            }
+            this.endReached = false;
+        }
+    }
+
+    void setInteractionPossible(boolean possible) {
+        btnHfNext.setDisable(possible);
+        btnHfToFirst.setDisable(possible);
+        btnHfToLast.setDisable(possible);
+        btnHfPrevious.setDisable(possible);
+        tfStepSize.setDisable(possible);
+        tfStepSpeed.setDisable(possible);
+    }
+
+    boolean endReached;
+    void doAnimationStep() {
+        this.currentIterationIndex += stepSize;
+        if (this.currentIterationIndex >= hpo.getIterations().size()) {
+            this.currentIterationIndex = hpo.getIterations().size() - 1;
+            this.endReached = true;
+        }
+        drawIteration();
+        if (this.endReached) {
+            btnHfRun.fire();
+        }
     }
 
     void drawIteration() {
 
+        textCurrentIteration.setText("Current iteration: " + (this.currentIterationIndex + 1) + "/" + hpo.getIterations().size());
+
         GraphicsContext gc = canvasHopfield.getGraphicsContext2D();
-        gc.moveTo(0,0);
 
         boolean[][] matrix = hpo.getIteration(this.currentIterationIndex);
+
+        this.canvasHopfield.setHeight(matrix.length*height);
+        this.canvasHopfield.setWidth(matrix.length*width);
+
+        this.hfProgressBar.setMinWidth(matrix.length*width);
+
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
                 double x = j*width;
@@ -103,6 +245,25 @@ public class HopfieldController {
                 gc.fillRect(x,y,width,height);
             }
         }
+
+        double progress = ((double)this.currentIterationIndex)/((double)hpo.getIterations().size());
+
+        if (this.currentIterationIndex == hpo.getIterations().size() - 1) {
+            hfProgressBar.setProgress(1.0);
+        } else {
+            hfProgressBar.setProgress(progress);
+        }
+
+        drawBorder(gc);
+    }
+
+    private void drawBorder(GraphicsContext g) {
+        final double canvasWidth = g.getCanvas().getWidth();
+        final double canvasHeight = g.getCanvas().getHeight();
+
+        g.setStroke(Color.BLACK);
+        g.setLineWidth(4);
+        g.strokeRect(0, 0, canvasWidth, canvasHeight);
     }
 
     void firstIteration() {
