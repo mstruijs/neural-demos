@@ -55,6 +55,9 @@ public class MainController {
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
+
+        tabPaneMain.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
+
         miFileLoad.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
