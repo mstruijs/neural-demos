@@ -3,6 +3,7 @@ package controllers;
 import com.sun.javaws.progress.Progress;
 import external.HopfieldPythonOutput;
 import javafx.animation.Animation;
+import javafx.animation.Interpolatable;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
@@ -79,6 +80,9 @@ public class HopfieldController {
     @FXML
     ProgressBar hfProgressBar;
 
+    @FXML
+    Slider hfSlider;
+
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
 
@@ -109,6 +113,26 @@ public class HopfieldController {
         this.atl.setCycleCount(Animation.INDEFINITE);
 
         this.endReached = false;
+
+        this.hfProgressBar.setMinWidth(this.hpo.getIteration(0).length*width);
+
+        this.hfSlider.setMin(0);
+        this.hfSlider.setMax(this.hpo.getIterations().size() - 1);
+        this.hfSlider.setBlockIncrement(1.0);
+
+        this.hfSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                currentIterationIndex = newValue.intValue() ;
+                if (currentIterationIndex < 0) {
+                    currentIterationIndex = 0;
+                }
+
+                endReached = currentIterationIndex == hpo.getIterations().size() - 1;
+
+                drawIteration();
+            }
+        });
 
         drawIteration();
 
@@ -181,6 +205,9 @@ public class HopfieldController {
     }
 
     void animate() {
+        if (this.endReached) {
+            this.currentIterationIndex = 0;
+        }
         if (!animating) {
             btnHfRun.setText("Pause");
             setInteractionPossible(true);
@@ -191,9 +218,6 @@ public class HopfieldController {
             setInteractionPossible(false);
             this.atl.stop();
             animating = false;
-            if (this.endReached) {
-                this.currentIterationIndex = 0;
-            }
             this.endReached = false;
         }
     }
@@ -205,6 +229,7 @@ public class HopfieldController {
         btnHfPrevious.setDisable(possible);
         tfStepSize.setDisable(possible);
         tfStepSpeed.setDisable(possible);
+        hfSlider.setDisable(possible);
     }
 
     boolean endReached;
@@ -214,6 +239,7 @@ public class HopfieldController {
             this.currentIterationIndex = hpo.getIterations().size() - 1;
             this.endReached = true;
         }
+        hfSlider.adjustValue(this.currentIterationIndex);
         drawIteration();
         if (this.endReached) {
             btnHfRun.fire();
@@ -230,8 +256,6 @@ public class HopfieldController {
 
         this.canvasHopfield.setHeight(matrix.length*height);
         this.canvasHopfield.setWidth(matrix.length*width);
-
-        this.hfProgressBar.setMinWidth(matrix.length*width);
 
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
@@ -255,6 +279,7 @@ public class HopfieldController {
         }
 
         drawBorder(gc);
+        hfSlider.adjustValue(this.currentIterationIndex);
     }
 
     private void drawBorder(GraphicsContext g) {
