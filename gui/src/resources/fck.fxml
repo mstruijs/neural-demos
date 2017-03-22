@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.chart.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="413.0" prefWidth="882.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.FckController">
+   <children>
+      <LineChart fx:id="lineChart" layoutX="128.0" layoutY="40.0" prefHeight="363.0" prefWidth="474.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="128.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="40.0">
+        <xAxis>
+          <NumberAxis side="BOTTOM" fx:id="xAxis" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis fx:id="yAxis" side="LEFT" />
+        </yAxis>
+      </LineChart>
+      <Button fx:id="btnPlay" layoutX="14.0" layoutY="28.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="41.0" text="Run" />
+      <ProgressBar layoutX="145.0" layoutY="14.0" prefHeight="18.0" prefWidth="453.0" progress="0.0" AnchorPane.leftAnchor="145.0" AnchorPane.rightAnchor="14.0" />
+      <Button fx:id="btnReseed" layoutX="60.0" layoutY="28.0" mnemonicParsing="false" text="New Seed" />
+   </children>
+</AnchorPane>

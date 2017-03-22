@@ -8,8 +8,8 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="716.0" prefWidth="1057.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.HopfieldController">
    <children>
-      <Canvas fx:id="canvasHopfield" height="446.0" layoutX="323.0" layoutY="43.0" width="538.0" AnchorPane.bottomAnchor="227.0" AnchorPane.leftAnchor="323.0" AnchorPane.topAnchor="43.0" />
-      <Pane layoutX="14.0" layoutY="14.0" prefHeight="200.0" prefWidth="290.0">
+      <Canvas fx:id="canvasHopfield" height="446.0" layoutX="323.0" layoutY="83.0" width="538.0" AnchorPane.bottomAnchor="187.0" AnchorPane.leftAnchor="323.0" AnchorPane.topAnchor="83.0" />
+      <Pane layoutX="14.0" layoutY="14.0" prefHeight="240.0" prefWidth="290.0">
          <children>
             <Pane prefHeight="48.0" prefWidth="283.0">
                <children>
@@ -20,21 +20,24 @@
                   <Button fx:id="btnHfRun" layoutX="238.0" layoutY="12.0" mnemonicParsing="false" text="Run" />
                </children>
             </Pane>
-            <Pane layoutY="40.0" prefHeight="54.0" prefWidth="227.0">
+            <Pane layoutY="93.0" prefHeight="54.0" prefWidth="227.0">
                <children>
                   <TextField fx:id="tfStepSize" layoutX="14.0" layoutY="21.0" prefHeight="25.0" prefWidth="166.0" promptText="Step size" />
                   <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Step size" />
                </children>
             </Pane>
-            <Pane layoutY="94.0" prefHeight="60.0" prefWidth="206.0">
+            <Pane layoutY="142.0" prefHeight="60.0" prefWidth="206.0">
                <children>
                   <TextField fx:id="tfStepSpeed" layoutX="14.0" layoutY="21.0" prefHeight="25.0" prefWidth="166.0" promptText="Step speed" />
-                  <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Step speed" />
+                  <Text layoutX="14.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Step speed (ms)" />
                </children>
             </Pane>
-            <Text fx:id="taDescription" layoutX="14.0" layoutY="167.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="227.13671875" />
+            <Text fx:id="taDescription" layoutX="14.0" layoutY="215.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="227.13671875" />
+            <Slider fx:id="hfSlider" layoutX="14.0" layoutY="71.0" />
+            <Text layoutX="14.0" layoutY="61.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Step manually" wrappingWidth="89.76318359375" />
          </children>
       </Pane>
       <Text fx:id="textCurrentIteration" layoutX="323.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" wrappingWidth="410.759765625" />
+      <ProgressBar fx:id="hfProgressBar" layoutX="323.0" layoutY="48.0" prefWidth="200.0" progress="0.0" />
    </children>
 </AnchorPane>

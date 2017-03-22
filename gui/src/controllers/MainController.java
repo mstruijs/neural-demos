@@ -109,15 +109,29 @@ public class MainController {
 
         System.out.println("loading neural network demo UI");
 
-        PythonOutput po = OpenController.po;
-        NeuralDemoConfig ndc = OpenController.nnCfg;
 
+        NeuralDemoConfig ndc = OpenController.nnCfg;
         switch(ndc.getNnType()) {
             case Hopfield:
+                PythonOutput po = OpenController.po;
                 loadHopfieldUI((HopfieldPythonOutput) po);
                 break;
             default:
-                 System.out.println("uh oh");
+                 loadFckUI();
+        }
+    }
+
+    // Set the fish chips ketchup ui
+    void loadFckUI() {
+        try {
+            Tab tab = FXMLLoader.load(getClass().getResource("../resources/tab.fxml"), resources);
+            tab.setContent(FXMLLoader.load(getClass().getResource("../resources/fck.fxml"), resources));
+            tab.setText("");
+            Tab editableTab = makeTabTitleEditable(tab, "Fish, chips, and ketchup");
+            tabPaneMain.getTabs().add(editableTab);
+            tabPaneMain.getSelectionModel().select(tabPaneMain.getTabs().size() -1);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
