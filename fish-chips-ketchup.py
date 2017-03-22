@@ -33,7 +33,7 @@ def reset_network(verbose=True):
 reset_network()
 	
 
-def random_train_adaline(values, buy_limit, samples, plot=True, epochs=500,epsilon=0.01,test_data=None, iterative_sampling=False):
+def random_train_adaline(values, buy_limit, samples, plot=True, epochs=500,epsilon=0.025,test_data=None, iterative_sampling=False):
 	'''
 	Trains the adaline by providing randomly selected amounts of the values and determining the correct cost but adding them in the right values.
 
@@ -52,7 +52,7 @@ def random_train_adaline(values, buy_limit, samples, plot=True, epochs=500,epsil
 	train_method = train_iterative if iterative_sampling else train_adaline
 	train_method(values, random_input, plot, epochs, epsilon, test_data)
 		
-def fixed_train_adaline(values, samples, plot=True, epochs=500, epsilon=0.01, test_data=None, iterative_sampling=False):
+def fixed_train_adaline(values, samples, plot=True, epochs=500, epsilon=0.025, test_data=None, iterative_sampling=False):
 	'''
 	Trains the adaline with provided samples.
 
@@ -88,7 +88,7 @@ def train_adaline(values, samples, plot=True, epochs=500,epsilon=0.01, test_data
 	if plot:
 		plots.error_plot(adaline)
 
-def train_iterative(values, samples, plot=True, epochs=500, epsilon=0.01, test_data=None):
+def train_iterative(values, samples, plot=True, epochs=500, epsilon=0.025, test_data=None):
 	'''
 	'''
 	output = [sum([sample[i]*values[i] for i in range(0,len(values))]) for sample in samples]
