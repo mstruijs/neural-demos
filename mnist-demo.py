@@ -20,7 +20,9 @@ import sys
 from neupy import algorithms, layers, plots, storage
 import numpy as np
 import theano
+import argparse
 from scipy import misc
+
 
 theano.config.floatX = 'float32' #use smaller floats for efficiency
 
@@ -125,9 +127,31 @@ def show_image(image, filename):
 		subprocess.run("explorer \".\data\\" + filename + ".jpg\"")	
 	else:
 		print("I don't know what standard image viewer there is on this os: {} ".format(sys.platform))
-		
+
+def get_args():
+	parser = argparse.ArgumentParser(description="MNIST demo")
+	group = parser.add_mutually_exclusive_group()
+	group.add_argument('-t', '--train', help="Train a network and store it with the given name", required=False)
+	group.add_argument('-l', '--load', help="Load a trained network with the given name", required=False)
+	parser.add_argument('-c', '--classify', help="Classify the test image at the given index", required=False, type=int)
+	
+	return vars(parser.parse_args())
+	
 if __name__ == "__main__" :
-	#images = mnist.train_images()
-	#show_image(images[0,:,:], "aha")
-	#train(error_plot=True, test=True, storage_name="MNISTdemo1")
-	#classify(0,network_storage="MNISTdemo1",test=True)
+	args = get_args()
+	if args['train']!=None:
+		train(error_plot=True, test=True, storage_name=str(args['train']))
+		if args['classify']!=None:
+			classify(int(args['classify']), network_storage=None, test=False,show=True)
+	elif args['load']!=None and args['classify']!=None:
+		classify(int(args['classify']), network_storage=str(args['load']), test=True)
+	else:
+		#If no valid argument combination is given, just run the basic demo
+
+		
+		#images = mnist.train_images()
+		#show_image(images[0,:,:], "aha")
+
+		train(error_plot=True, test=True)
+
+		#classify(0,network_storage="MNISTdemo1",test=True)
