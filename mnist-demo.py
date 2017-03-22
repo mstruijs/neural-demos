@@ -85,27 +85,46 @@ def train(error_plot=False, test=False, storage_name=None):
 		storage.save(network, filepath = "data/" + storage_name + ".pickle")
 
 		
-def classify(index, network_storage=None, test=False,show=True):
+def classify(index, network_storage=None, test=False, filter_mismatch=False, filter_class=None, show=True):
 	'''
 	Uses the current network to attempt to classify an image of the test set at the given index. 
 	Optionally, network_storage is loaded first, the network is tested first or the image can not be shown.
+	If a filter is applied, the index refers to the index in the reduced test-set after filtering.
 	'''
-	image = normalised_test_images[index]
-	image_class = test_labels[index]
+	image_index = index
 	if network_storage!=None:
 		storage.load(network, "data/" + network_storage + ".pickle")
 	if test:
 		test_network()
+	#Compute all labels to prepare to find mismatches
+	if filter_mismatch or filter_class!=None:
+		recorded_labels = np.array(test_labels)
+		test_data = normalised_test_images.astype(np.float32)
+		predicted_labels = network.predict(test_data).argmax(axis=1)
+		currentIndex = -1;#The current index in the filtered array
+		for i in range(0,len(recorded_labels)):
+			if (filter_mismatch and recorded_labels[i]==predicted_labels[i]) or (filter_class!=None and recorded_labels[i]!=filter_class):
+				continue
+			currentIndex+=1;
+			if currentIndex==index:
+				image_index = i
+				print('Index found at '+ str(i) + '.')
+				break
+		if currentIndex < index:
+			print("End of filtered data reached, no more elements found")
+			return
+	image = normalised_test_images[image_index]	
+	image_class = test_labels[image_index]
+	
 	if show:
 		images= mnist.test_images()
-		show_image(images[index,:,:], 'MNISTtemp')
-	print("Classifying image #"+ str(index) + " of class '"+ str(image_class) + "'...")
+		show_image(images[image_index,:,:], 'MNISTtemp')
+	print("Classifying image #"+ str(image_index) + " of class '"+ str(image_class) + "'...")
 	predicted_class = network.predict(image).argmax(axis=1)[0]
 	if predicted_class==image_class:
 		print("The network correctly classified the image as '" + str(predicted_class) +"'.")
 	else:
 		print("The network incorrectly classified the image as '" + str(predicted_class) +"', while the actual class is '" + str(image_class) + "'.")
-		
 
 def test_network(error_plot=False):
 	#Test the network on the test-dataset
@@ -134,17 +153,20 @@ def get_args():
 	group.add_argument('-t', '--train', help="Train a network and store it with the given name", required=False)
 	group.add_argument('-l', '--load', help="Load a trained network with the given name", required=False)
 	parser.add_argument('-c', '--classify', help="Classify the test image at the given index", required=False, type=int)
-	
+	parser.add_argument('-sc', '--specifyclass', help="Filter the test-set to only consider cases of the given type", required=False, type=int)
+	parser.add_argument('-fm', '--filtermismatch', help="Filter the test-set to only consider cases where the network makes an incorrect prediction", required=False)
 	return vars(parser.parse_args())
 	
 if __name__ == "__main__" :
 	args = get_args()
+	print(args)
 	if args['train']!=None:
 		train(error_plot=True, test=True, storage_name=str(args['train']))
 		if args['classify']!=None:
 			classify(int(args['classify']), network_storage=None, test=False,show=True)
 	elif args['load']!=None and args['classify']!=None:
-		classify(int(args['classify']), network_storage=str(args['load']), test=True)
+				
+		classify(int(args['classify']), network_storage=str(args['load']), filter_mismatch= (args['filtermismatch']!=None), filter_class=args['specifyclass'], test=True)
 	else:
 		#If no valid argument combination is given, just run the basic demo
 
