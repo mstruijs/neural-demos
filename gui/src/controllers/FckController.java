@@ -3,14 +3,22 @@ package controllers;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
-import javafx.scene.layout.Pane;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import java.net.URL;
@@ -37,25 +45,109 @@ public class FckController {
     @FXML
     private Pane lineChartPane;
 
+    @FXML
+    private ProgressBar fckProgressBar;
+
+    @FXML
+    private TextField tfStepSpeed;
+
+    @FXML
+    private TextField tfStepSize;
+
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
+
+        this.init = true;
 
         this.currentIndex = 0;
 
         this.result = new LinearNeuron().GetResult();
 
-        this.stepSpeed = 200;
+        this.stepSpeed = 20;
+
+        this.stepSize = 1;
+
+        this.tfStepSize.setText(Integer.toString(this.stepSize));
+        this.tfStepSpeed.setText(Integer.toString(this.stepSpeed));
 
         this.animating = false;
 
-        xAxis = new NumberAxis(0,this.result.iterations.size() + 10,10);
+
+        this.lineChartPane.setBorder(new Border(new BorderStroke(Color.BLACK,
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+
+        initLineChart();
+
+        this.atl = new Timeline(new KeyFrame(Duration.millis(stepSpeed), event -> {
+            doAnimationStep();
+        }));
+        this.atl.setCycleCount(Animation.INDEFINITE);
+
+        this.btnPlay.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                animate();
+            }
+        });
+
+        this.btnReseed.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                result = new LinearNeuron().GetResult();
+                currentIndex = 0;
+                initLineChart();
+                doAnimationStep();
+            }
+        });
+
+        tfStepSize.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (newValue.isEmpty()){
+                    return;
+                }
+                if (!newValue.matches("\\d*")) {
+                    tfStepSize.setText(newValue.replaceAll("[^\\d]", ""));
+                } else {
+                    stepSize = Integer.parseInt(newValue);
+                }
+            }
+        });
+
+        tfStepSpeed.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (newValue.isEmpty()){
+                    return;
+                }
+                if (!newValue.matches("\\d*")) {
+                    tfStepSpeed.setText(newValue.replaceAll("[^\\d]", ""));
+                } else {
+                    stepSpeed = Integer.parseInt(newValue);
+                    atl = new Timeline(new KeyFrame(Duration.millis(stepSpeed), event -> {
+                        doAnimationStep();
+                    }));
+                    atl.setCycleCount(Animation.INDEFINITE);
+                }
+            }
+        });
+
+        doAnimationStep();
+    }
+
+    // Initiate the linechart
+    private void initLineChart() {
+
+        this.lineChartPane.getChildren().remove(this.lineChart);
+
+        xAxis = new NumberAxis(0,this.result.iterations.size()- 1,10);
         xAxis.setForceZeroInRange(false);
         xAxis.setAutoRanging(false);
         xAxis.setTickLabelsVisible(true);
         xAxis.setTickMarkVisible(true);
         xAxis.setMinorTickVisible(false);
 
-        this.yAxis = new NumberAxis(0,this.result.maxValue + this.result.minValue,10);
+        this.yAxis = new NumberAxis(0,200,10);
         this.yAxis.setForceZeroInRange(false);
         this.yAxis.setAutoRanging(false);
         this.yAxis.setTickLabelsVisible(true);
@@ -70,40 +162,39 @@ public class FckController {
             }
         };
 
+        this.lineChart.setLegendVisible(false);
+
+        this.fckProgressBar.setMinWidth(this.lineChart.getWidth());
+
         this.lineChart.setAnimated(false);
 
         this.lineChartPane.getChildren().add(this.lineChart);
 
-        this.atl = new Timeline(new KeyFrame(Duration.millis(stepSpeed), event -> {
-            doAnimationStep();
-        }));
-        this.atl.setCycleCount(Animation.INDEFINITE);
-
-        this.btnPlay.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                animate();
-            }
-        });
-
+        this.lineChart.setMinSize(600,600);
+        this.lineChartPane.setMinSize(500,620);
     }
 
     // Start animating
     private void animate() {
 
         if (!animating) {
+            btnPlay.setText("Pause");
             this.atl.play();
         } else {
+            btnPlay.setText("Run");
             this.atl.stop();
         }
 
         this.animating = !animating;
-
         setAllDisabled(this.animating);
     }
 
     // Single animation step
     private void doAnimationStep() {
+
+        if (currentIndex >= result.iterations.size()) {
+            currentIndex = result.iterations.size() - 1;
+        }
 
         XYChart.Series seriesFish = new XYChart.Series();
         // fish = blauw
@@ -118,7 +209,7 @@ public class FckController {
         // ketchup = rood
         seriesKetchup.setName("Ketchup price");
 
-        for (int i =0; i < currentIndex; i++) {
+        for (int i = 0; i < currentIndex; i++) {
             seriesFish.getData().add(new XYChart.Data(i, this.result.iterations.get(i).fishPrice));
             seriesChips.getData().add(new XYChart.Data(i, this.result.iterations.get(i).chipPrice));
             seriesKetchup.getData().add(new XYChart.Data(i, this.result.iterations.get(i).ketchupPrice));
@@ -129,18 +220,49 @@ public class FckController {
         lineChart.getData().add(seriesChips);
         lineChart.getData().add(seriesKetchup);
 
+        if (init) {
+            this.init = false;
+        } else {
+            ObservableList<XYChart.Series> data = lineChart.getData();
+            changeLineChartSeriesColour(data.get(data.size() - 3).getNode().lookup(".chart-series-line"),Color.BLUE);
+            changeLineChartSeriesColour(data.get(data.size() - 2).getNode().lookup(".chart-series-line"),Color.GREEN);
+            changeLineChartSeriesColour(data.get(data.size() - 1).getNode().lookup(".chart-series-line"),Color.RED);
+        }
+
+
         lineChart.setCreateSymbols(false);
 
-        currentIndex++;
+        double progress = ((double)this.currentIndex)/((double)this.result.iterations.size());
 
-        if (currentIndex == result.iterations.size()) {
-            atl.stop();
+        if (this.currentIndex == this.result.iterations.size() - 1) {
+            fckProgressBar.setProgress(1.0);
+        } else {
+            fckProgressBar.setProgress(progress);
+        }
+
+        if (currentIndex == result.iterations.size() - 1) {
+            animate();
             currentIndex = 0;
+        } else {
+            currentIndex += this.stepSize;
         }
     }
 
+
+    private void changeLineChartSeriesColour(Node line, Color color) {
+        String rgb = String.format("%d, %d, %d",
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255));
+        System.out.println(rgb);
+
+        line.setStyle("-fx-stroke: rgba(" + rgb + ", 1.0);");
+    }
+
     private void setAllDisabled(boolean disabled) {
-        btnReseed.setDisable(disabled);
+        this.tfStepSpeed.setDisable(disabled);
+        this.tfStepSize.setDisable(disabled);
+        this.btnReseed.setDisable(disabled);
     }
 
     // whether we are animating or not
@@ -155,9 +277,11 @@ public class FckController {
     // Step speed
     int stepSpeed;
 
+    // Step size
+    int stepSize;
+
     // How far we've animated so far
     int currentIndex;
-
 
     private LineChart lineChart;
 
@@ -165,6 +289,7 @@ public class FckController {
 
     private NumberAxis yAxis;
 
+    boolean init;
 }
 
 /**

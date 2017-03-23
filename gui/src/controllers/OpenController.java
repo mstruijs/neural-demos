@@ -169,6 +169,7 @@ public class OpenController {
 
     // Disable buttons and Text Views
     private void setInteractionImpossible(boolean value) {
+        btnScriptLocationBrowse.setDisable(value);
         btnTrainingBrowse.setDisable(value);
         btnTestBrowse.setDisable(value);
         btnCancelLoad.setDisable(value);
