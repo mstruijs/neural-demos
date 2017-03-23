@@ -64,7 +64,7 @@ public class OpenController {
 
         this.fileChooser = new FileChooser();
 
-        ObservableList<String> nnOptions = FXCollections.observableArrayList("Hopfield","Test");
+        ObservableList<String> nnOptions = FXCollections.observableArrayList("Hopfield","Fish Chips Ketchup");
 
         nnComboBox.setItems(nnOptions);
         nnComboBox.setOnAction(new EventHandler<ActionEvent>() {
@@ -112,12 +112,14 @@ public class OpenController {
 
     public static PythonOutput po;
     private void nnLoadDone() {
-        PythonHandler ph = new PythonHandler();
         nnCfg = localCfg;
-        try {
-            po = ph.runPythonScript(nnCfg);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (localCfg.getNnType().equals(NeuralDemoConfig.NNType.Hopfield)) {
+            PythonHandler ph = new PythonHandler();
+            try {
+                po = ph.runPythonScript(nnCfg);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         Stage stage = (Stage) btnCancelLoad.getScene().getWindow();
         MainController.loadSuccess = true;
@@ -157,11 +159,22 @@ public class OpenController {
     private void retrieveComboBoxSelection() {
         String selectedNN = nnComboBox.getSelectionModel().getSelectedItem().toString();
         localCfg.setNnType(selectedNN);
+        setInteractionImpossible(localCfg.getNnType().equals(NeuralDemoConfig.NNType.FCK));
     }
 
     private File chooseFile() {
         File selectedFile = RetentionFileChooser.showOpenDialog();
         return selectedFile;
+    }
+
+    // Disable buttons and Text Views
+    private void setInteractionImpossible(boolean value) {
+        btnTrainingBrowse.setDisable(value);
+        btnTestBrowse.setDisable(value);
+        btnCancelLoad.setDisable(value);
+        taScriptLocation.setDisable(value);
+        taTrainingData.setDisable(value);
+        taTestData.setDisable(value);
     }
 
     // File browsing

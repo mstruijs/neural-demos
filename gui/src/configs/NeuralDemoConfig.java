@@ -8,7 +8,8 @@ import java.io.File;
 public class NeuralDemoConfig {
 
     public enum NNType {
-        Hopfield
+        Hopfield,
+        FCK
     }
 
     private NNType nnType;
@@ -29,7 +30,7 @@ public class NeuralDemoConfig {
                 this.nnType = NNType.Hopfield;
                 break;
             default:
-                this.nnType = NNType.Hopfield;
+                this.nnType = NNType.FCK;
         }
     }
 
