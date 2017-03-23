@@ -10,6 +10,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
 import java.net.URL;
@@ -28,19 +29,13 @@ public class FckController {
     private URL location;
 
     @FXML
-    private LineChart lineChart;
-
-    @FXML
-    private NumberAxis xAxis;
-
-    @FXML
-    private NumberAxis yAxis;
-
-    @FXML
     private Button btnReseed;
 
     @FXML
     private Button btnPlay;
+
+    @FXML
+    private Pane lineChartPane;
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
@@ -52,6 +47,32 @@ public class FckController {
         this.stepSpeed = 200;
 
         this.animating = false;
+
+        xAxis = new NumberAxis(0,this.result.iterations.size() + 10,10);
+        xAxis.setForceZeroInRange(false);
+        xAxis.setAutoRanging(false);
+        xAxis.setTickLabelsVisible(true);
+        xAxis.setTickMarkVisible(true);
+        xAxis.setMinorTickVisible(false);
+
+        this.yAxis = new NumberAxis(0,this.result.maxValue + this.result.minValue,10);
+        this.yAxis.setForceZeroInRange(false);
+        this.yAxis.setAutoRanging(false);
+        this.yAxis.setTickLabelsVisible(true);
+        this.yAxis.setTickMarkVisible(true);
+        this.yAxis.setMinorTickVisible(false);
+
+        // Create a LineChart
+        this.lineChart = new LineChart<Number, Number>(xAxis, yAxis) {
+            // Override to remove symbols on each data point
+            @Override
+            protected void dataItemAdded(Series<Number, Number> series, int itemIndex, Data<Number, Number> item) {
+            }
+        };
+
+        this.lineChart.setAnimated(false);
+
+        this.lineChartPane.getChildren().add(this.lineChart);
 
         this.atl = new Timeline(new KeyFrame(Duration.millis(stepSpeed), event -> {
             doAnimationStep();
@@ -85,13 +106,17 @@ public class FckController {
     private void doAnimationStep() {
 
         XYChart.Series seriesFish = new XYChart.Series();
+        // fish = blauw
         seriesFish.setName("Fish price");
+        //seriesFish.getChart().
 
         XYChart.Series seriesChips = new XYChart.Series();
+        // chips = groen
         seriesChips.setName("Chips price");
 
         XYChart.Series seriesKetchup = new XYChart.Series();
-        seriesChips.setName("Ketchup price");
+        // ketchup = rood
+        seriesKetchup.setName("Ketchup price");
 
         for (int i =0; i < currentIndex; i++) {
             seriesFish.getData().add(new XYChart.Data(i, this.result.iterations.get(i).fishPrice));
@@ -103,6 +128,8 @@ public class FckController {
         lineChart.getData().add(seriesFish);
         lineChart.getData().add(seriesChips);
         lineChart.getData().add(seriesKetchup);
+
+        lineChart.setCreateSymbols(false);
 
         currentIndex++;
 
@@ -130,6 +157,14 @@ public class FckController {
 
     // How far we've animated so far
     int currentIndex;
+
+
+    private LineChart lineChart;
+
+    private NumberAxis xAxis;
+
+    private NumberAxis yAxis;
+
 }
 
 /**
@@ -157,6 +192,11 @@ class LinearNeuron {
 
         // the maximum value encountered
         double maxValue = Double.MIN_VALUE;
+
+        // the min value encoutered
+        double minValue = Double.MAX_VALUE;
+
+        // all ierations
         ArrayList<FishChipKetchupPrice> iterations = new ArrayList<>();
 
         // nextInt is normally exclusive of the top value,
@@ -182,6 +222,7 @@ class LinearNeuron {
             price_ketchup = price_ketchup + eps*cnt_ketchup*(her_price-my_price);
 
             maxValue = Math.max(Math.max(Math.max(price_chips, price_chips),price_ketchup),maxValue);
+            minValue = Math.min(Math.min(Math.min(price_chips, price_chips),price_ketchup),minValue);
 
             iterations.add(new FishChipKetchupPrice(price_fish,price_chips,price_ketchup));
 
@@ -194,16 +235,18 @@ class LinearNeuron {
             System.out.println();
         }
 
-        return new FishChipKetchupResult(maxValue, iterations);
+        return new FishChipKetchupResult(minValue, maxValue, iterations);
     }
 }
 
 class FishChipKetchupResult {
 
+    public double minValue;
     public double maxValue;
     public ArrayList<FishChipKetchupPrice> iterations;
 
-    public FishChipKetchupResult(double maxValue, ArrayList<FishChipKetchupPrice> iterations) {
+    public FishChipKetchupResult(double minValue, double maxValue, ArrayList<FishChipKetchupPrice> iterations) {
+        this.minValue = minValue;
         this.maxValue = maxValue;
         this.iterations = iterations;
     }
